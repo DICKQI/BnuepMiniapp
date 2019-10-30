@@ -1,10 +1,14 @@
 import Taro from '@tarojs/taro'
 import {View} from '@tarojs/components'
-import {AtInput, AtButton, AtMessage} from 'taro-ui'
-import {ClButton, ClInput} from 'mp-colorui'
+import {AtMessage} from 'taro-ui'
+import {ClButton, ClInput, ClFlex} from 'mp-colorui'
 import {hostname} from "../../config/proxy";
 
 export default class createTeam extends Taro.Component {
+
+  config = {
+    navigationBarTitleText: '创建队伍'
+  };
 
   constructor() {
     super(...arguments);
@@ -44,7 +48,7 @@ export default class createTeam extends Taro.Component {
         guide_teacher: this.state.guide_teacher
       },
       header: {
-        'Cookie': Taro.getStorageSync('cookies')[0],
+        'Cookie': Taro.getStorageSync('cookies'),
         'Content-Type': 'application/json'
       }
     }).then(res => {
@@ -52,11 +56,12 @@ export default class createTeam extends Taro.Component {
         Taro.atMessage({
           'message': '创建成功',
           'type': 'success'
-        }).then(
+        });
+        setTimeout(() => {
           Taro.reLaunch({
             url: '/pages/index/index'
           })
-        )
+        }, 1000)
       } else {
         Taro.atMessage({
           'message': res.data.errMsg,
@@ -72,13 +77,15 @@ export default class createTeam extends Taro.Component {
         <AtMessage/>
         <View style='margin-top: 8vh;'>
           <ClInput title='作品名' name='work_name' type='text' onChange={this.setWorkName.bind(this)}
-                   value={this.state.works_name} placeholder='请输入作品名'/>
+                   value={this.state.works_name} placeholder='请输入作品名' titleWidth='150px'/>
           <ClInput title='团队名' name='team_name' type='text' onChange={this.setTeamName.bind(this)}
-                   value={this.state.team_name} placeholder='请输入团队名'/>
+                   value={this.state.team_name} placeholder='请输入团队名' titleWidth='150px'/>
           <ClInput title='指导老师' name='guide_teacher' type='text' onChange={this.setGuideTeacher.bind(this)}
-                   value={this.state.guide_teacher} placeholder='请输入指导老师姓名'/>
+                   value={this.state.guide_teacher} placeholder='请输入指导老师姓名' titleWidth='200px'/>
           <View style='margin-top: 2vh;'>
-            <ClButton long shape={"radius"} formType={"submit"} onClick={this.createTeam.bind(this)}>创建</ClButton>
+            <ClFlex justify={"center"} align={"center"}>
+              <ClButton long shape={"radius"} formType={"submit"} onClick={this.createTeam.bind(this)}>创建</ClButton>
+            </ClFlex>
           </View>
         </View>
       </View>
