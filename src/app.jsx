@@ -17,7 +17,9 @@ class App extends Component {
       'pages/index/index',
       'pages/contest/contestDetail',
       'pages/contest/createTeam',
+      'pages/contest/contestMyTeamDetail',
       'pages/user/register',
+      'pages/user/editUser'
 
     ],
     window: {
@@ -25,7 +27,7 @@ class App extends Component {
       navigationBarBackgroundColor: '#fff',
       navigationBarTitleText: 'WeChat',
       navigationBarTextStyle: 'black',
-      enablePullDownRefresh: true
+      // enablePullDownRefresh: true
     },
     enablePullDownRefresh: true
   };

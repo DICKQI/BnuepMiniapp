@@ -1,9 +1,10 @@
 import Taro from '@tarojs/taro'
-import {View, Text} from '@tarojs/components'
-import {AtMessage, AtAvatar} from 'taro-ui'
+import {View, Text, Image} from '@tarojs/components'
+import {AtMessage, AtAvatar, AtCurtain} from 'taro-ui'
 import {ClText, ClCard, ClButton, ClFlex} from 'mp-colorui'
 import {hostname} from "../../config/proxy";
 import './index.scss'
+import code from '../../res/2dcode.jpeg'
 
 class Dashboard extends Taro.Component {
 
@@ -20,12 +21,17 @@ class Dashboard extends Taro.Component {
       major: '',
       email: '',
       contest: [],
-      empty: true
+      empty: true,
+
+      show: false
     }
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.getMyInformation();
+    Taro.setNavigationBarTitle({
+      'title': '我的'
+    })
   }
 
   getMyInformation() {
@@ -46,6 +52,10 @@ class Dashboard extends Taro.Component {
         this.setState({
           empty: false
         })
+      } else {
+        this.setState({
+          empty: true
+        })
       }
       this.setState({
         name: res.data.myDetail.name,
@@ -59,7 +69,13 @@ class Dashboard extends Taro.Component {
 
   toContestDetail(cid) {
     Taro.navigateTo({
-      url: '/pages/contest/contestDetail?cid=' + cid
+      url: '/pages/contest/contestMyTeamDetail?cid=' + cid
+    })
+  }
+
+  toChangeUserInfo() {
+    Taro.navigateTo({
+      url: '/pages/user/editUser'
     })
   }
 
@@ -91,39 +107,62 @@ class Dashboard extends Taro.Component {
     })
   }
 
+  openCode() {
+    this.setState({
+      show: true
+    })
+  }
+
+  onClose() {
+    this.setState({
+      show: false
+    })
+  }
+
+
+
   render() {
     return (
       <View>
         <AtMessage/>
+        <AtCurtain onClose={this.onClose.bind(this)} isOpened={this.state.show}>
+          <Image src={code} mode={"aspectFit"}/>
+          <ClText text='请截图后添加微信' align={"center"} bgColor={"blue"} size={"xxlarge"}/>
+        </AtCurtain>
         <View style='margin-top:5vh; margin-left: 2vh' className='at-row'>
           <View className='at-col'>
             <AtAvatar openData={
               {type: 'userAvatarUrl'}
             } size={"large"}/>
           </View>
-          <View className='at-col' style='margin-top:1vh;'>
+          <View className='at-col'>
             <View>
               <ClText
                 text={this.state.name}
-                size={"xlarge"}/>
+                size={"large"}/>
             </View>
             <View>
               <ClText
                 text={this.state.student_id}
-                size={"xlarge"}/>
+                size={"large"}/>
+            </View>
+            <View style='margin-right: -7vh;'>
+              <ClText
+                text={this.state.major}
+                size={"large"}/>
             </View>
           </View>
           <View className='at-col' style='margin-left: 15vh; margin-top: -1vh'>
             <View>
-              <ClButton shape={"radius"} onClick={this.logout.bind(this)} bgColor={"blue"}>登出</ClButton>
+              <ClButton shape={"radius"} onClick={this.logout.bind(this)} bgColor={"gradualBlue"}>登出</ClButton>
             </View>
             <View style='margin-top: 1vh;'>
-              <ClButton shape={"radius"} bgColor={"blue"}>编辑</ClButton>
+              <ClButton shape={"radius"} bgColor={"gradualBlue"} onClick={this.toChangeUserInfo.bind(this)}>编辑</ClButton>
             </View>
           </View>
         </View>
         <View style='margin-top: 3vh'>
-          <ClText align={"center"} text='我参加的比赛' bgColor={"gradualGreen"}/>
+          <ClText align={"center"} text='我参加的比赛' bgColor={"gradualBlue"}/>
           {
             this.state.empty ?
               <View style='margin-top: 5vh'>
@@ -142,6 +181,9 @@ class Dashboard extends Taro.Component {
                 </View>
               })
           }
+        </View>
+        <View style='margin-top: 3vh; margin-bottom: 10vh;' onClick={this.openCode.bind(this)}>
+          <ClText textColor={"grey"} text={'在使用过程中遇到的任何问题，可以在单击此处咨询开发者'} align={"center"}/>
         </View>
       </View>
     );

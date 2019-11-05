@@ -69,7 +69,7 @@ class register extends Taro.Component {
         'type': 'error'
       });
       return
-    } else if (this.state.wechat=== '') {
+    } else if (this.state.wechat === '') {
       Taro.atMessage({
         'message': '微信号不能为空',
         'type': 'error'
@@ -225,7 +225,7 @@ class register extends Taro.Component {
         'Content-Type': 'application/json'
       }
     }).then(res => {
-      Taro.setStorageSync('cookies', res.cookies);
+      Taro.setStorageSync('cookies', res.header['Set-Cookie']);
     })
   }
 

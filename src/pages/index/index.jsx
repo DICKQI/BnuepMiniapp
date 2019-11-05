@@ -109,6 +109,7 @@ export default class Index extends Component {
     return (
       <View className='index'>
         <AtMessage/>
+        <View style='margin-bottom:10vh;'>
         {
           this.state.current === 0 ?
             (
@@ -132,6 +133,7 @@ export default class Index extends Component {
             :
             <Login isLogin={this.state.isLogin}/>
         }
+        </View>
         <AtTabBar fixed current={this.state.current} tabList={[
           {title: '比赛', iconType: 'home'},
           {title: '我的', iconType: 'user'}
