@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro'
 import {View} from '@tarojs/components'
-import {AtMessage, AtTabBar, AtModal} from 'taro-ui'
+import {AtMessage, AtModal} from 'taro-ui'
 import {ClAccordion, ClLayout, ClCard, ClText, ClButton, ClDrawer, ClInput} from 'mp-colorui'
 import {hostname} from "../../config/proxy";
 
@@ -16,8 +16,11 @@ class contestMyTeamDetail extends Taro.Component {
     this.state = {
       team: [],
       chooseTid: 0,
+      chooseMid: 0,
       showDrawer: false,
-      works_link: ''
+      showDeleteCheckModal: false,
+      works_link: '',
+
     }
   }
 
@@ -100,10 +103,61 @@ class contestMyTeamDetail extends Taro.Component {
     })
   }
 
+  setMemberID(mid, tid, leader, isMyself) {
+    if (leader) {
+      if (isMyself !== 'leader') {
+        this.setState({
+          chooseTid: tid,
+          chooseMid: mid,
+          showDeleteCheckModal: true
+        })
+      }
+    }
+  }
+
+  deleteMember() {
+    Taro.request({
+      url: hostname + "contest/team/" + this.state.chooseTid + "/" + this.$router.params.cid + "/" + this.state.chooseMid + "/",
+      method: "DELETE",
+      header: {
+        'Cookie': Taro.getStorageSync('cookies')
+      }
+    }).then(res => {
+      if (res.statusCode === 200) {
+        Taro.atMessage({
+          'message': "成功移除",
+          "type": 'success'
+        });
+        setTimeout(() => {
+          this.setState({
+            team: []
+          });
+          this.loadMyContestInformation();
+        }, 1200)
+      } else {
+        Taro.atMessage({
+          'message': res.data.errMsg,
+          'type': 'error'
+        })
+      }
+    });
+    this.setState({
+      showDeleteCheckModal: false
+    })
+  }
+
+  closeModal() {
+    this.setState({
+      showDeleteCheckModal: false
+    })
+  }
+
   render() {
     return (
       <View>
         <AtMessage/>
+        <AtModal isOpened={this.state.showDeleteCheckModal} title={'是否要移除成员'} confirmText={"确认"} cancelText={"取消"}
+                 onCancel={this.closeModal.bind(this)} onConfirm={this.deleteMember.bind(this)}/>
         <ClDrawer show={this.state.showDrawer} direction={"bottom"} onCancel={this.closeDrawer.bind(this)}>
           <View style='margin-top: 1vh'>
             <ClText size={"xxlarge"} text={'请按照以下规范提交作品'} align={"center"}/></View>
@@ -138,11 +192,13 @@ class contestMyTeamDetail extends Taro.Component {
                         return <View key={index2}>
                           <ClLayout padding={"small"} paddingDirection={"around"}>
                             <ClCard type={"full"}>
-                              <View><ClText text={
-                                item2.memberRoles === 'leader' ?
-                                  item2.name + '(leader)' : item2.name
-                              }
-                                            textColor={"black"}/></View>
+                              <View
+                                onClick={this.setMemberID.bind(this, item2.id, item.id, item.leader, item2.memberRoles)}><ClText
+                                text={
+                                  item2.memberRoles === 'leader' ?
+                                    item2.name + '(leader)' : item2.name
+                                }
+                                textColor={"black"}/></View>
                             </ClCard>
                           </ClLayout>
                         </View>
@@ -160,7 +216,6 @@ class contestMyTeamDetail extends Taro.Component {
             })
           }
         </View>
-
       </View>
     );
   }
